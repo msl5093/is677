@@ -1,0 +1,103 @@
+---
+title: "hw6"
+author: "Mike Lehman"
+date: "October 11, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## #1
+
+```{r}
+library(ggplot2)
+library(effects)
+data(diamonds)
+
+price_df <- as.data.frame(diamonds[,"price"])
+colnames(price_df) <- c("price")
+summary(price_df$price)
+d <- ggplot(price_df["price"], aes(x = price))
+d + geom_density()
+```
+
+## #2
+
+```{r}
+d_log10 <- ggplot(price_df["price"], aes(x = log(price, base = 10)))
+summary(log(price_df$price, base = 10))
+d_log10 + geom_density()
+```
+
+Performing a log (base 10) transformation on the price variable was worthwhile in this case because it reduced the scope of the varialbe's distribution and brought the mean and median much closer than they were in the raw data.
+
+Since the range of the raw data for the price variable was so wide and all values were positive, a log transformation was worthwhile.
+
+
+## #3
+
+```{r}
+set.seed(123)
+train_sample <- sample(53940, 26970)
+
+diamonds_train <- diamonds[train_sample, ]
+diamonds_test  <- diamonds[-train_sample, ]
+
+str(diamonds_train)
+str(diamonds_test)
+```
+
+## #4
+
+```{r}
+price_reg <- lm(price ~ carat + cut + color + clarity, data = diamonds_train)
+summary(price_reg)
+
+price_reg_log10 <- lm(log(price, base = 10) ~ carat + cut + color + clarity, data = diamonds_train)
+summary(price_reg_log10)
+```
+
+## #5
+
+```{r}
+diamonds_test$price_log10 <- log(diamonds_test$price, base = 10)
+diamonds_test$PricePrediction <- predict(price_reg, newdata = diamonds_test)
+diamonds_test$PricePrediction_log10 <- predict(price_reg_log10, newdata = diamonds_test)
+head(diamonds_test)
+```
+
+## #6
+
+```{r}
+a <- ggplot(data = diamonds_test, aes(x = PricePrediction, y = PricePrediction - price))
+a + geom_point(alpha = 0.2, color = "black") + geom_smooth(aes(x = PricePrediction, y = PricePrediction - price), color = "black")
+
+b <- ggplot(data = diamonds_test, aes(x = PricePrediction_log10, y = PricePrediction_log10 - price_log10))
+b + geom_point(alpha = 0.2, color = "black") + geom_smooth(aes(x = PricePrediction_log10, y = PricePrediction_log10 - price_log10), color = "black")
+```
+
+## #7
+
+```{r}
+confint(price_reg)
+par(mfrow=c(2,2))
+plot(price_reg)
+
+c <- ggplot(data = diamonds_test, aes(x = PricePrediction, y = price))
+c + geom_point(alpha = 0.2, color = "black") + geom_smooth(aes(x = PricePrediction, y = price), color = "black") + geom_line(aes(x = log(PricePrediction, base = 10), y = log(price, base = 10)), color = "blue", linetype = 2)
+
+confint(price_reg_log10)
+par(mfrow=c(2,2))
+plot(price_reg_log10)
+
+d <- ggplot(data = diamonds_test, aes(x = PricePrediction_log10, y = price_log10))
+d + geom_point(alpha = 0.2, color = "black") + geom_smooth(aes(x = PricePrediction_log10, y = price_log10), color = "black")
+```
+
+From the above graphs and plots, we can see that both models do an acceptable job of predicting the price. Neither is perfect or particularly outstanding.
+
+Looking at the confidence intervals for each model, it appears that carat, cut, and clarity are the most strongly correlated with the dependent variable, price. Most of the other variables are of little or no strong correlation, which could be why some of our plots indicate wider distributions of the pedicted versus actual values.
+
+If choosing which model is more accurate, the log(base 10) transformed model yielded better results between the two. This is likely because transforming the price variable brought the range of values closer together, and the median a better resprentative of a specific candidate.
