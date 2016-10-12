@@ -95,8 +95,8 @@ d <- ggplot(data = diamonds_test, aes(x = PricePrediction_log10, y = price_log10
 d + geom_point(alpha = 0.2, color = "black") + geom_smooth(aes(x = PricePrediction_log10, y = price_log10), color = "black")
 ```
 
-From the above graphs and plots, we can see that both models do an acceptable job of predicting the price. Neither is perfect or particularly outstanding.
+From the above graphs and plots, we can see that both models do an acceptable job of predicting the price. 
 
-Looking at the confidence intervals for each model, it appears that carat, cut, and clarity are the most strongly correlated with the dependent variable, price. Most of the other variables are of little or no strong correlation, which could be why some of our plots indicate wider distributions of the pedicted versus actual values.
+Looking at the confidence intervals for each model, it appears that carat, cut, and clarity are the most strongly correlated with the dependent variable, price. Both models also seem to have a somewhat linear pattern. There is not perfect linearity here, but the lines in the above graphs show general linearity and the values are largely consistent among the scatter.
 
 If choosing which model is more accurate, the log(base 10) transformed model yielded better results between the two. This is likely because transforming the price variable brought the range of values closer together, and the median a better resprentative of a specific candidate.
