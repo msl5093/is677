@@ -1,6 +1,5 @@
 #1
 library(ggplot2)
-library(effects)
 data(diamonds)
 
 price_df <- as.data.frame(diamonds[,"price"])
