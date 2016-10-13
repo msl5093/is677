@@ -25,19 +25,19 @@ str(diamonds_test)
 
 #4
 price_reg <- lm(price ~ carat + cut + color + clarity, data = diamonds_train)
-summary(price_reg)
+price_reg
 
 price_reg_log10 <- lm(log(price, base = 10) ~ carat + cut + color + clarity, data = diamonds_train)
-summary(price_reg_log10)
+price_reg_log10
 
 #5
-
+# create log base(10) transformed version of price feature for reference
 diamonds_test$price_log10 <- log(diamonds_test$price, base = 10)
 diamonds_test$PricePrediction <- predict(price_reg, newdata = diamonds_test)
 diamonds_test$PricePrediction_log10 <- predict(price_reg_log10, newdata = diamonds_test)
+head(diamonds_test)
 
 #6
-
 a <- ggplot(data = diamonds_test, aes(x = PricePrediction, y = PricePrediction - price))
 a + geom_point(alpha = 0.2, color = "black") + geom_smooth(aes(x = PricePrediction, y = PricePrediction - price), color = "black")
 

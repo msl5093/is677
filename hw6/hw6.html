@@ -184,84 +184,41 @@ str(diamonds_train)</code></pre>
 <div id="section-3" class="section level2">
 <h2>#4</h2>
 <pre class="r"><code>price_reg &lt;- lm(price ~ carat + cut + color + clarity, data = diamonds_train)
-summary(price_reg)</code></pre>
+price_reg</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = price ~ carat + cut + color + clarity, data = diamonds_train)
 ## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -16783.6   -676.0   -199.6    464.9   9734.9 
-## 
 ## Coefficients:
-##              Estimate Std. Error  t value Pr(&gt;|t|)    
-## (Intercept) -3724.458     19.872 -187.427  &lt; 2e-16 ***
-## carat        8894.155     17.143  518.809  &lt; 2e-16 ***
-## cut.L         720.433     28.599   25.191  &lt; 2e-16 ***
-## cut.Q        -339.831     25.209  -13.481  &lt; 2e-16 ***
-## cut.C         175.185     21.832    8.024 1.06e-15 ***
-## cut^4          -4.072     17.523   -0.232    0.816    
-## color.L     -1928.960     25.072  -76.936  &lt; 2e-16 ***
-## color.Q      -632.759     22.835  -27.710  &lt; 2e-16 ***
-## color.C      -200.682     21.366   -9.393  &lt; 2e-16 ***
-## color^4        17.243     19.642    0.878    0.380    
-## color^5       -91.521     18.592   -4.923 8.59e-07 ***
-## color^6       -42.536     16.930   -2.512    0.012 *  
-## clarity.L    4268.663     43.956   97.112  &lt; 2e-16 ***
-## clarity.Q   -1794.710     41.145  -43.619  &lt; 2e-16 ***
-## clarity.C     966.876     35.192   27.474  &lt; 2e-16 ***
-## clarity^4    -311.778     28.153  -11.075  &lt; 2e-16 ***
-## clarity^5     213.314     22.962    9.290  &lt; 2e-16 ***
-## clarity^6       6.386     19.977    0.320    0.749    
-## clarity^7     108.414     17.631    6.149 7.90e-10 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 1162 on 26951 degrees of freedom
-## Multiple R-squared:  0.915,  Adjusted R-squared:  0.915 
-## F-statistic: 1.612e+04 on 18 and 26951 DF,  p-value: &lt; 2.2e-16</code></pre>
+## (Intercept)        carat        cut.L        cut.Q        cut.C  
+##   -3724.458     8894.155      720.433     -339.831      175.185  
+##       cut^4      color.L      color.Q      color.C      color^4  
+##      -4.072    -1928.960     -632.759     -200.682       17.243  
+##     color^5      color^6    clarity.L    clarity.Q    clarity.C  
+##     -91.521      -42.536     4268.663    -1794.710      966.876  
+##   clarity^4    clarity^5    clarity^6    clarity^7  
+##    -311.778      213.314        6.386      108.414</code></pre>
 <pre class="r"><code>price_reg_log10 &lt;- lm(log(price, base = 10) ~ carat + cut + color + clarity, data = diamonds_train)
-summary(price_reg_log10)</code></pre>
+price_reg_log10</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = log(price, base = 10) ~ carat + cut + color + clarity, 
 ##     data = diamonds_train)
 ## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -2.59629 -0.09512  0.02553  0.10781  0.72075 
-## 
 ## Coefficients:
-##               Estimate Std. Error  t value Pr(&gt;|t|)    
-## (Intercept)  2.5712714  0.0025103 1024.273  &lt; 2e-16 ***
-## carat        0.9550545  0.0021657  440.991  &lt; 2e-16 ***
-## cut.L        0.0280646  0.0036129    7.768 8.26e-15 ***
-## cut.Q       -0.0104373  0.0031846   -3.277  0.00105 ** 
-## cut.C        0.0110580  0.0027580    4.009 6.10e-05 ***
-## cut^4        0.0006581  0.0022137    0.297  0.76625    
-## color.L     -0.2156317  0.0031673  -68.080  &lt; 2e-16 ***
-## color.Q     -0.0662756  0.0028847  -22.975  &lt; 2e-16 ***
-## color.C      0.0011813  0.0026991    0.438  0.66162    
-## color^4      0.0203386  0.0024814    8.196 2.58e-16 ***
-## color^5     -0.0061295  0.0023487   -2.610  0.00906 ** 
-## color^6      0.0004805  0.0021388    0.225  0.82224    
-## clarity.L    0.3364601  0.0055529   60.592  &lt; 2e-16 ***
-## clarity.Q   -0.1613721  0.0051978  -31.046  &lt; 2e-16 ***
-## clarity.C    0.0996837  0.0044458   22.422  &lt; 2e-16 ***
-## clarity^4   -0.0288661  0.0035565   -8.116 5.00e-16 ***
-## clarity^5    0.0243339  0.0029008    8.389  &lt; 2e-16 ***
-## clarity^6   -0.0007686  0.0025237   -0.305  0.76069    
-## clarity^7    0.0028658  0.0022273    1.287  0.19823    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.1468 on 26951 degrees of freedom
-## Multiple R-squared:  0.8887, Adjusted R-squared:  0.8886 
-## F-statistic: 1.196e+04 on 18 and 26951 DF,  p-value: &lt; 2.2e-16</code></pre>
+## (Intercept)        carat        cut.L        cut.Q        cut.C  
+##   2.5712714    0.9550545    0.0280646   -0.0104373    0.0110580  
+##       cut^4      color.L      color.Q      color.C      color^4  
+##   0.0006581   -0.2156317   -0.0662756    0.0011813    0.0203386  
+##     color^5      color^6    clarity.L    clarity.Q    clarity.C  
+##  -0.0061295    0.0004805    0.3364601   -0.1613721    0.0996837  
+##   clarity^4    clarity^5    clarity^6    clarity^7  
+##  -0.0288661    0.0243339   -0.0007686    0.0028658</code></pre>
 </div>
 <div id="section-4" class="section level2">
 <h2>#5</h2>
-<pre class="r"><code>diamonds_test$price_log10 &lt;- log(diamonds_test$price, base = 10)
+<pre class="r"><code># create log base(10) transformed version of price feature for reference
+diamonds_test$price_log10 &lt;- log(diamonds_test$price, base = 10)
 diamonds_test$PricePrediction &lt;- predict(price_reg, newdata = diamonds_test)
 diamonds_test$PricePrediction_log10 &lt;- predict(price_reg_log10, newdata = diamonds_test)
 head(diamonds_test)</code></pre>
