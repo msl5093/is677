@@ -1,0 +1,77 @@
+---
+title: "HW7"
+author: "Mike Lehman"
+date: "October 17, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#1
+polypharm <- read.csv("polypharm.csv")
+str(polypharm)
+```
+
+```{r}
+#2
+polypharm_data <- polypharm[-1]
+str(polypharm_data)
+```
+
+```{r}
+#3
+polypharm_data$YEAR <- factor(polypharm_data$YEAR)
+polypharm_data$ETHNIC <- factor(polypharm_data$ETHNIC)
+polypharm_data$GENDER <- factor(polypharm_data$GENDER)
+polypharm_data$URBAN <- factor(polypharm_data$URBAN)
+polypharm_data$RACE <- factor(polypharm_data$RACE)
+polypharm_data$ANYPRIM <- factor(polypharm_data$ANYPRIM)
+polypharm_data$NUMPRIM <- factor(polypharm_data$NUMPRIM)
+polypharm_data$COMORBID <- factor(polypharm_data$COMORBID)
+polypharm_data$GROUP <- factor(polypharm_data$GROUP)
+polypharm_data$MHV4 <- factor(polypharm_data$MHV4)
+polypharm_data$INPTMHV3 <- factor(polypharm_data$INPTMHV3)
+str(polypharm_data)
+```
+
+Reassigning the YEAR variable as a factor is important because the variable is initially loaded in as an integer. By reassigning it to a factor, our model will calculate the impact on the dependent variable for a given factor level, or in our case year.
+
+Otherwise it would have been treated as an integer and because it has ordinal levels would have likely skewed our results.
+
+```{r}
+#4
+set.seed(123)
+train_sample <- sample(3500,1750)
+
+poly_train <- polypharm_data[train_sample,]
+poly_test <- polypharm_data[-train_sample,]
+```
+
+```{r}
+#5
+y <- "POLYPHARMACY"
+x <- c('MHV4','INPTMHV3','YEAR','GROUP','URBAN','COMORBID','ANYPRIM','NUMPRIM','GENDER','RACE','ETHNIC','AGE')
+poly_log <- paste(y, paste(x, collapse = "+"), sep = "~")
+```
+
+```{r}
+#6
+model <- glm(poly_log, family = binomial(link='logit'), data = poly_train)
+```
+
+```{r}
+#7
+summary(model)
+coefficients(model)
+```
+
+a. The variable MHV4 is quite significant. Not only do we see a low p value from the summary output, but we can also see that the coefficient is quite high for level three MHV4 and is also noticably high for first and second level.
+b. MHV40 is the refernece level. When we converted MHV4 to a factor, R treated the first level as the reference level. This can also be observed because MHV40 is not listed in the outputs for the model. We could reorder using relevel() to see any difference.
+c. 
+
+```{r}
+#8
+```
