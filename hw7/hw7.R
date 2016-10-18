@@ -12,8 +12,6 @@ polypharm_data$ETHNIC <- factor(polypharm_data$ETHNIC)
 polypharm_data$GENDER <- factor(polypharm_data$GENDER)
 polypharm_data$URBAN <- factor(polypharm_data$URBAN)
 polypharm_data$RACE <- factor(polypharm_data$RACE)
-polypharm_data$ANYPRIM <- factor(polypharm_data$ANYPRIM)
-polypharm_data$NUMPRIM <- factor(polypharm_data$NUMPRIM)
 polypharm_data$COMORBID <- factor(polypharm_data$COMORBID)
 polypharm_data$GROUP <- factor(polypharm_data$GROUP)
 polypharm_data$MHV4 <- factor(polypharm_data$MHV4)
@@ -41,3 +39,30 @@ coefficients(model)
 
 #8
 poly_test$PRED <- predict(model, newdata = poly_test, type = "response")
+str(poly_test)
+
+#9
+loglikelihood <- function(y, py){
+  sum(y * log(py) + (1-y)*log(1 - py), na.rm = TRUE)
+}
+
+#10
+testy <- as.numeric(poly_test$POLYPHARMACY)
+testpred <- predict(model, newdata = poly_test, type="response")
+pnull.test <- mean(testy)
+null.dev.test <- -2*loglikelihood(testy, pnull.test)
+resid.dev.test <- -2*loglikelihood(testy, testpred)
+
+null.dev.test
+resid.dev.test
+
+# difference between null and residual deviances
+delDev <- null.dev.test - resid.dev.test
+
+# difference in degrees of freedom between null and model
+df.null <- dim(poly_test)[[1]] - 1
+df.model <- dim(poly_test)[[1]] - length(model$coefficients)
+deldf <- df.null - df.model
+
+# obtain p value using chi squared distribution
+p <- pchisq(delDev, deldf, lower.tail=F)

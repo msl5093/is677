@@ -164,8 +164,6 @@ polypharm_data$ETHNIC &lt;- factor(polypharm_data$ETHNIC)
 polypharm_data$GENDER &lt;- factor(polypharm_data$GENDER)
 polypharm_data$URBAN &lt;- factor(polypharm_data$URBAN)
 polypharm_data$RACE &lt;- factor(polypharm_data$RACE)
-polypharm_data$ANYPRIM &lt;- factor(polypharm_data$ANYPRIM)
-polypharm_data$NUMPRIM &lt;- factor(polypharm_data$NUMPRIM)
 polypharm_data$COMORBID &lt;- factor(polypharm_data$COMORBID)
 polypharm_data$GROUP &lt;- factor(polypharm_data$GROUP)
 polypharm_data$MHV4 &lt;- factor(polypharm_data$MHV4)
@@ -179,14 +177,14 @@ str(polypharm_data)</code></pre>
 ##  $ GROUP       : Factor w/ 3 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;: 1 1 1 1 1 2 2 2 2 2 ...
 ##  $ URBAN       : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 1 1 1 1 1 1 1 1 1 1 ...
 ##  $ COMORBID    : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 2 2 1 2 2 2 2 2 2 1 ...
-##  $ ANYPRIM     : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 2 2 1 2 2 2 2 2 2 2 ...
-##  $ NUMPRIM     : Factor w/ 5 levels &quot;0&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 2 2 1 2 2 2 2 2 2 2 ...
+##  $ ANYPRIM     : int  1 1 0 1 1 1 1 1 1 1 ...
+##  $ NUMPRIM     : int  1 1 0 1 1 1 1 1 1 1 ...
 ##  $ GENDER      : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 1 1 1 1 1 1 1 2 2 2 ...
 ##  $ RACE        : Factor w/ 3 levels &quot;0&quot;,&quot;1&quot;,&quot;2&quot;: 1 1 1 1 1 1 1 2 2 2 ...
 ##  $ ETHNIC      : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 1 1 1 1 1 1 1 1 1 1 ...
 ##  $ AGE         : num  4.67 5.67 6 7.08 8 ...</code></pre>
-<p>Reassigning the YEAR variable as a factor is important because the variable is initially loaded in as an integer. By reassigning it to a factor, our model will calculate the impact on the dependent variable for a given factor level, or in our case year.</p>
-<p>Otherwise it would have been treated as an integer and because it has ordinal levels would have likely skewed our results.</p>
+<p>We have to recode several of the variables to factors to better model their relationships to the target variable. If they are left as integer variables the model cannot accurately measure the impact that any of the values accurately have on the target variable. Also, several of these variables are ingerently nominal and would incorrectly inform the model using values of 1 and 0. A GENDER of 1 is not inherently greater than a GENDER of 0.</p>
+<p>For example, by reassigning these variables to factors, we can better understand how a difference of GENDER or URBAN has an effect on POLYPHARMACY.</p>
 <pre class="r"><code>#4
 set.seed(123)
 train_sample &lt;- sample(3500,1750)
@@ -207,61 +205,106 @@ summary(model)</code></pre>
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -1.6785  -0.7260  -0.4739  -0.2208   2.5457  
+## -1.6825  -0.7239  -0.4755  -0.2203   2.5478  
 ## 
-## Coefficients: (1 not defined because of singularities)
-##               Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.722043   0.436779  -8.522  &lt; 2e-16 ***
-## MHV41         0.490997   0.277610   1.769  0.07695 .  
-## MHV42         1.461088   0.263726   5.540 3.02e-08 ***
-## MHV43         2.196462   0.258937   8.483  &lt; 2e-16 ***
-## INPTMHV31     0.578677   0.287312   2.014  0.04400 *  
-## INPTMHV32     0.782468   0.448780   1.744  0.08124 .  
-## YEAR2003      0.220638   0.275375   0.801  0.42300    
-## YEAR2004      1.082745   0.255862   4.232 2.32e-05 ***
-## YEAR2005      0.827946   0.267551   3.095  0.00197 ** 
-## YEAR2006      1.111327   0.276268   4.023 5.75e-05 ***
-## YEAR2007      0.937040   0.302267   3.100  0.00193 ** 
-## YEAR2008      1.213803   0.310478   3.909 9.25e-05 ***
-## GROUP2        0.410046   0.140919   2.910  0.00362 ** 
-## GROUP3        0.589636   0.185095   3.186  0.00144 ** 
-## URBAN1       -0.438423   0.144983  -3.024  0.00249 ** 
-## COMORBID1    -0.200300   0.203425  -0.985  0.32480    
-## ANYPRIM1    -13.054606 302.989166  -0.043  0.96563    
-## NUMPRIM1     12.992438 302.989157   0.043  0.96580    
-## NUMPRIM2     13.387177 302.989953   0.044  0.96476    
-## NUMPRIM12           NA         NA      NA       NA    
-## GENDER1       0.482737   0.164369   2.937  0.00332 ** 
-## RACE1        -0.880099   0.190406  -4.622 3.80e-06 ***
-## RACE2        -0.794457   0.887328  -0.895  0.37061    
-## ETHNIC1      -0.194961   0.689756  -0.283  0.77744    
-## AGE           0.002326   0.031020   0.075  0.94023    
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -3.736469   0.436882  -8.553  &lt; 2e-16 ***
+## MHV41        0.506818   0.277162   1.829  0.06746 .  
+## MHV42        1.469296   0.263862   5.568 2.57e-08 ***
+## MHV43        2.201334   0.259184   8.493  &lt; 2e-16 ***
+## INPTMHV31    0.577668   0.287286   2.011  0.04435 *  
+## INPTMHV32    0.783335   0.448790   1.745  0.08091 .  
+## YEAR2003     0.210381   0.274921   0.765  0.44413    
+## YEAR2004     1.072392   0.255358   4.200 2.67e-05 ***
+## YEAR2005     0.816096   0.266940   3.057  0.00223 ** 
+## YEAR2006     1.098195   0.275573   3.985 6.74e-05 ***
+## YEAR2007     0.929077   0.301847   3.078  0.00208 ** 
+## YEAR2008     1.211335   0.310012   3.907 9.33e-05 ***
+## GROUP2       0.407796   0.140900   2.894  0.00380 ** 
+## GROUP3       0.583566   0.184912   3.156  0.00160 ** 
+## URBAN1      -0.439249   0.144981  -3.030  0.00245 ** 
+## COMORBID1   -0.195795   0.203547  -0.962  0.33609    
+## ANYPRIM      0.199672   0.310249   0.644  0.51984    
+## NUMPRIM     -0.258505   0.270663  -0.955  0.33954    
+## GENDER1      0.487926   0.164194   2.972  0.00296 ** 
+## RACE1       -0.882788   0.190325  -4.638 3.51e-06 ***
+## RACE2       -0.810104   0.887184  -0.913  0.36118    
+## ETHNIC1     -0.161382   0.689577  -0.234  0.81496    
+## AGE          0.003509   0.030987   0.113  0.90984    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
 ##     Null deviance: 1893.5  on 1749  degrees of freedom
-## Residual deviance: 1612.7  on 1726  degrees of freedom
-## AIC: 1660.7
+## Residual deviance: 1613.7  on 1727  degrees of freedom
+## AIC: 1659.7
 ## 
-## Number of Fisher Scoring iterations: 14</code></pre>
+## Number of Fisher Scoring iterations: 7</code></pre>
 <pre class="r"><code>coefficients(model)</code></pre>
-<pre><code>##   (Intercept)         MHV41         MHV42         MHV43     INPTMHV31 
-##  -3.722042647   0.490997107   1.461087839   2.196462297   0.578677193 
-##     INPTMHV32      YEAR2003      YEAR2004      YEAR2005      YEAR2006 
-##   0.782467540   0.220637884   1.082745235   0.827946411   1.111326532 
-##      YEAR2007      YEAR2008        GROUP2        GROUP3        URBAN1 
-##   0.937040484   1.213803213   0.410045712   0.589636111  -0.438422958 
-##     COMORBID1      ANYPRIM1      NUMPRIM1      NUMPRIM2     NUMPRIM12 
-##  -0.200299804 -13.054606469  12.992438252  13.387176650            NA 
-##       GENDER1         RACE1         RACE2       ETHNIC1           AGE 
-##   0.482737202  -0.880099406  -0.794457046  -0.194961024   0.002325741</code></pre>
+<pre><code>##  (Intercept)        MHV41        MHV42        MHV43    INPTMHV31 
+## -3.736468648  0.506817568  1.469295568  2.201333821  0.577667803 
+##    INPTMHV32     YEAR2003     YEAR2004     YEAR2005     YEAR2006 
+##  0.783334589  0.210380945  1.072391710  0.816096490  1.098195123 
+##     YEAR2007     YEAR2008       GROUP2       GROUP3       URBAN1 
+##  0.929076893  1.211334589  0.407795665  0.583566490 -0.439249218 
+##    COMORBID1      ANYPRIM      NUMPRIM      GENDER1        RACE1 
+## -0.195794943  0.199672427 -0.258504995  0.487925877 -0.882788312 
+##        RACE2      ETHNIC1          AGE 
+## -0.810104384 -0.161382193  0.003508936</code></pre>
 <ol style="list-style-type: lower-alpha">
-<li>The variable MHV4 is quite significant. Not only do we see a low p value from the summary output, but we can also see that the coefficient is quite high for level three MHV4 and is also noticably high for first and second level.</li>
-<li></li>
+<li>The variable MHV4 is quite significant. Not only do we see a low p value from the summary output, but we can also see that the coefficient is quite high for level three MHV4 and is also noticably high for first and second levels.</li>
+<li>MHV40 is the refernece level. When we converted MHV4 to a factor, R treated the first level as the reference level. This can also be observed because MHV40 is not listed in the outputs for the model.</li>
 <li></li>
 </ol>
+<pre class="r"><code>#8
+poly_test$PRED &lt;- predict(model, newdata = poly_test, type = &quot;response&quot;)
+str(poly_test)</code></pre>
+<pre><code>## 'data.frame':    1750 obs. of  14 variables:
+##  $ POLYPHARMACY: int  0 0 0 0 0 0 0 1 1 1 ...
+##  $ MHV4        : Factor w/ 4 levels &quot;0&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;: 1 1 3 3 3 3 3 4 4 4 ...
+##  $ INPTMHV3    : Factor w/ 3 levels &quot;0&quot;,&quot;1&quot;,&quot;2&quot;: 1 1 1 1 1 1 1 1 3 2 ...
+##  $ YEAR        : Factor w/ 7 levels &quot;2002&quot;,&quot;2003&quot;,..: 1 5 7 1 2 6 7 1 2 3 ...
+##  $ GROUP       : Factor w/ 3 levels &quot;1&quot;,&quot;2&quot;,&quot;3&quot;: 1 1 2 2 2 1 1 2 2 2 ...
+##  $ URBAN       : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ COMORBID    : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 2 2 2 2 2 1 1 1 1 1 ...
+##  $ ANYPRIM     : int  1 1 1 1 1 0 1 0 1 0 ...
+##  $ NUMPRIM     : int  1 1 1 1 1 0 1 0 1 0 ...
+##  $ GENDER      : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 1 1 1 2 2 2 2 2 2 2 ...
+##  $ RACE        : Factor w/ 3 levels &quot;0&quot;,&quot;1&quot;,&quot;2&quot;: 1 1 1 2 2 2 2 1 1 1 ...
+##  $ ETHNIC      : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ AGE         : num  4.67 8 10.67 7.58 8.08 ...
+##  $ PRED        : num  0.0184 0.0539 0.2962 0.0771 0.0936 ...</code></pre>
+<pre class="r"><code>#9
+# need to pass na.rm = TRUE to sum to account for any NA's
+loglikelihood &lt;- function(y, py){
+  sum(y * log(py) + (1-y)*log(1 - py), na.rm = TRUE)
+}</code></pre>
+<pre class="r"><code>#10
+testy &lt;- as.numeric(poly_test$POLYPHARMACY)
+testpred &lt;- predict(model, newdata = poly_test, type=&quot;response&quot;)
+pnull.test &lt;- mean(testy)
+null.dev.test &lt;- -2*loglikelihood(testy, pnull.test)
+resid.dev.test &lt;- -2*loglikelihood(testy, testpred)
+
+null.dev.test</code></pre>
+<pre><code>## [1] 1914.834</code></pre>
+<pre class="r"><code>resid.dev.test</code></pre>
+<pre><code>## [1] 1740.852</code></pre>
+<pre class="r"><code># difference between null and residual deviances
+delDev &lt;- null.dev.test - resid.dev.test
+
+# difference in degrees of freedom between null and model
+df.null &lt;- dim(poly_test)[[1]] - 1
+df.model &lt;- dim(poly_test)[[1]] - length(model$coefficients)
+deldf &lt;- df.null - df.model
+
+# obtain p value using chi squared distribution
+p &lt;- pchisq(delDev, deldf, lower.tail=F)</code></pre>
+<p>The model prediction is better than guessing the mean for all values (null model) as the deviance is smaller.</p>
+<p>OPTIONAL: By examining the difference between the null and residual deviances (delDev) and the difference in degrees of freedom between the null value and model, we can see that we get a low p value when applying chi squared distribution.</p>
+<p>With a relatively low p value, we can be reasonably sure that the likelihood of the model performing better than the null hyopthesis was not by chance.</p>
 
 
 

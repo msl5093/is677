@@ -28,8 +28,6 @@ polypharm_data$ETHNIC <- factor(polypharm_data$ETHNIC)
 polypharm_data$GENDER <- factor(polypharm_data$GENDER)
 polypharm_data$URBAN <- factor(polypharm_data$URBAN)
 polypharm_data$RACE <- factor(polypharm_data$RACE)
-polypharm_data$ANYPRIM <- factor(polypharm_data$ANYPRIM)
-polypharm_data$NUMPRIM <- factor(polypharm_data$NUMPRIM)
 polypharm_data$COMORBID <- factor(polypharm_data$COMORBID)
 polypharm_data$GROUP <- factor(polypharm_data$GROUP)
 polypharm_data$MHV4 <- factor(polypharm_data$MHV4)
@@ -37,9 +35,9 @@ polypharm_data$INPTMHV3 <- factor(polypharm_data$INPTMHV3)
 str(polypharm_data)
 ```
 
-Reassigning the YEAR variable as a factor is important because the variable is initially loaded in as an integer. By reassigning it to a factor, our model will calculate the impact on the dependent variable for a given factor level, or in our case year.
+We have to recode several of the variables to factors to better model their relationships to the target variable. If they are left as integer variables the model cannot accurately measure the impact that any of the values accurately have on the target variable. Also, several of these variables are ingerently nominal and would incorrectly inform the model using values of 1 and 0. A GENDER of 1 is not inherently greater than a GENDER of 0.
 
-Otherwise it would have been treated as an integer and because it has ordinal levels would have likely skewed our results.
+For example, by reassigning these variables to factors, we can better understand how a difference of GENDER or URBAN has an effect on POLYPHARMACY.
 
 ```{r}
 #4
@@ -68,10 +66,52 @@ summary(model)
 coefficients(model)
 ```
 
-a. The variable MHV4 is quite significant. Not only do we see a low p value from the summary output, but we can also see that the coefficient is quite high for level three MHV4 and is also noticably high for first and second level.
-b. MHV40 is the refernece level. When we converted MHV4 to a factor, R treated the first level as the reference level. This can also be observed because MHV40 is not listed in the outputs for the model. We could reorder using relevel() to see any difference.
-c. 
+a. The variable MHV4 is quite significant. Not only do we see a low p value from the summary output for each level (level 1 is over the 0.05 threshold for general significance but other levels are lower), we can also see that the coefficient is quite high for level three MHV4 and is also noticably high for first and second levels.
+
+b. MHV40 is the refernece level. When we converted MHV4 to a factor, R treated the first level as the reference level. This can also be observed because MHV40 is not listed in the outputs for the model.
+
+c. The odds of POLYPHARMACY for an individual with more than 14 outpatient mental health visits (MHV4) is: 2.201333821. This can be observed by the MHV43 level coefficient value. Since MHV40 is the reference level it is 0.
 
 ```{r}
 #8
+poly_test$PRED <- predict(model, newdata = poly_test, type = "response")
+str(poly_test)
 ```
+
+```{r}
+#9
+# need to pass na.rm = TRUE to sum to account for any NA's
+loglikelihood <- function(y, py){
+  sum(y * log(py) + (1-y)*log(1 - py), na.rm = TRUE)
+}
+```
+
+```{r}
+#10
+testy <- as.numeric(poly_test$POLYPHARMACY)
+testpred <- predict(model, newdata = poly_test, type="response")
+pnull.test <- mean(testy)
+null.dev.test <- -2*loglikelihood(testy, pnull.test)
+resid.dev.test <- -2*loglikelihood(testy, testpred)
+
+null.dev.test
+resid.dev.test
+
+# difference between null and residual deviances
+delDev <- null.dev.test - resid.dev.test
+
+# difference in degrees of freedom between null and model
+df.null <- dim(poly_test)[[1]] - 1
+df.model <- dim(poly_test)[[1]] - length(model$coefficients)
+deldf <- df.null - df.model
+
+# obtain p value using chi squared distribution
+p <- pchisq(delDev, deldf, lower.tail=F)
+p
+```
+
+The model prediction is better than guessing the mean for all values (null model) as the deviance is smaller.
+
+OPTIONAL: By examining the difference between the null and residual deviances (delDev) and the difference in degrees of freedom between the null value and model, we can see that we get a low p value when applying chi squared distribution.
+
+With a relatively low p value, we can be reasonably sure that the likelihood of the model performing better than the null hyopthesis was not by chance.
