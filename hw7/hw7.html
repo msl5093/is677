@@ -183,7 +183,7 @@ str(polypharm_data)</code></pre>
 ##  $ RACE        : Factor w/ 3 levels &quot;0&quot;,&quot;1&quot;,&quot;2&quot;: 1 1 1 1 1 1 1 2 2 2 ...
 ##  $ ETHNIC      : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 1 1 1 1 1 1 1 1 1 1 ...
 ##  $ AGE         : num  4.67 5.67 6 7.08 8 ...</code></pre>
-<p>We have to recode several of the variables to factors to better model their relationships to the target variable. If they are left as integer variables the model cannot accurately measure the impact that any of the values accurately have on the target variable. Also, several of these variables are ingerently nominal and would incorrectly inform the model using values of 1 and 0. A GENDER of 1 is not inherently greater than a GENDER of 0.</p>
+<p>We have to recode several of the variables to factors to better model their relationships to the target variable. If they are left as integer variables the model cannot accurately measure the impact that any of the values accurately have on the target variable. Also, several of these variables are inherently nominal and would incorrectly inform the model using values of 1 and 0. A GENDER of 1 is not inherently greater than a GENDER of 0.</p>
 <p>For example, by reassigning these variables to factors, we can better understand how a difference of GENDER or URBAN has an effect on POLYPHARMACY.</p>
 <pre class="r"><code>#4
 set.seed(123)
@@ -254,9 +254,9 @@ summary(model)</code></pre>
 ##        RACE2      ETHNIC1          AGE 
 ## -0.810104384 -0.161382193  0.003508936</code></pre>
 <ol style="list-style-type: lower-alpha">
-<li>The variable MHV4 is quite significant. Not only do we see a low p value from the summary output, but we can also see that the coefficient is quite high for level three MHV4 and is also noticably high for first and second levels.</li>
-<li>MHV40 is the refernece level. When we converted MHV4 to a factor, R treated the first level as the reference level. This can also be observed because MHV40 is not listed in the outputs for the model.</li>
-<li></li>
+<li><p>The variable MHV4 is quite significant. Not only do we see a low p value from the summary output for each level (level 1 is over the 0.05 threshold for general significance but other levels are lower), we can also see that the coefficient is quite high for level three MHV4 and is also noticably high for first and second levels.</p></li>
+<li><p>MHV40 is the refernece level. When we converted MHV4 to a factor, R treated the first level as the reference level. This can also be observed because MHV40 is not listed in the outputs for the model.</p></li>
+<li><p>The odds of POLYPHARMACY for an individual with more than 14 outpatient mental health visits (MHV4) is: 2.201333821 greater than an individual with 0 visits. This can be observed by the MHV43 level coefficient value. Since MHV40 is the reference level it is 0.</p></li>
 </ol>
 <pre class="r"><code>#8
 poly_test$PRED &lt;- predict(model, newdata = poly_test, type = &quot;response&quot;)
@@ -301,9 +301,11 @@ df.model &lt;- dim(poly_test)[[1]] - length(model$coefficients)
 deldf &lt;- df.null - df.model
 
 # obtain p value using chi squared distribution
-p &lt;- pchisq(delDev, deldf, lower.tail=F)</code></pre>
+p &lt;- pchisq(delDev, deldf, lower.tail=F)
+p</code></pre>
+<pre><code>## [1] 1.280637e-25</code></pre>
 <p>The model prediction is better than guessing the mean for all values (null model) as the deviance is smaller.</p>
-<p>OPTIONAL: By examining the difference between the null and residual deviances (delDev) and the difference in degrees of freedom between the null value and model, we can see that we get a low p value when applying chi squared distribution.</p>
+<p>OPTIONAL: By examining the difference between the null and residual deviances (delDev) and the difference in degrees of freedom between the null value and model (deldf), we can see that we get a low p value when applying chi squared distribution.</p>
 <p>With a relatively low p value, we can be reasonably sure that the likelihood of the model performing better than the null hyopthesis was not by chance.</p>
 
 

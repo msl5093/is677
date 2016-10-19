@@ -2,7 +2,7 @@
 title: "HW7"
 author: "Mike Lehman"
 date: "October 17, 2016"
-output: html_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
@@ -35,7 +35,7 @@ polypharm_data$INPTMHV3 <- factor(polypharm_data$INPTMHV3)
 str(polypharm_data)
 ```
 
-We have to recode several of the variables to factors to better model their relationships to the target variable. If they are left as integer variables the model cannot accurately measure the impact that any of the values accurately have on the target variable. Also, several of these variables are ingerently nominal and would incorrectly inform the model using values of 1 and 0. A GENDER of 1 is not inherently greater than a GENDER of 0.
+We have to recode several of the variables to factors to better model their relationships to the target variable. If they are left as integer variables the model cannot accurately measure the impact that any of the values accurately have on the target variable. Also, several of these variables are inherently nominal and would incorrectly inform the model using values of 1 and 0. A GENDER of 1 is not inherently greater than a GENDER of 0.
 
 For example, by reassigning these variables to factors, we can better understand how a difference of GENDER or URBAN has an effect on POLYPHARMACY.
 
@@ -70,7 +70,7 @@ a. The variable MHV4 is quite significant. Not only do we see a low p value from
 
 b. MHV40 is the refernece level. When we converted MHV4 to a factor, R treated the first level as the reference level. This can also be observed because MHV40 is not listed in the outputs for the model.
 
-c. The odds of POLYPHARMACY for an individual with more than 14 outpatient mental health visits (MHV4) is: 2.201333821. This can be observed by the MHV43 level coefficient value. Since MHV40 is the reference level it is 0.
+c. The odds of POLYPHARMACY for an individual with more than 14 outpatient mental health visits (MHV4) is: 2.201333821 greater than an individual with 0 visits. This can be observed by the MHV43 level coefficient value. Since MHV40 is the reference level it is 0.
 
 ```{r}
 #8
@@ -112,6 +112,6 @@ p
 
 The model prediction is better than guessing the mean for all values (null model) as the deviance is smaller.
 
-OPTIONAL: By examining the difference between the null and residual deviances (delDev) and the difference in degrees of freedom between the null value and model, we can see that we get a low p value when applying chi squared distribution.
+OPTIONAL: By examining the difference between the null and residual deviances (delDev) and the difference in degrees of freedom between the null value and model (deldf), we can see that we get a low p value when applying chi squared distribution.
 
 With a relatively low p value, we can be reasonably sure that the likelihood of the model performing better than the null hyopthesis was not by chance.
