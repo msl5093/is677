@@ -1,35 +1,60 @@
+---
+title: "HW10"
+author: "Mike Lehman"
+date: "11/12/2016"
+output: word_document
+---
+
+```{r}
 #1
 airports.df <- read.csv("airports.csv", row.names = 1)
 str(airports.df)
+```
 
+```{r}
 #2
 airports.mat <- as.matrix(airports.df)
 str(airports.mat)
+```
 
+```{r}
 #3
 library(igraph)
 g <- graph.adjacency(airports.mat, mode = "directed", weighted = TRUE)
+```
 
+```{r}
 #4
 V(g)
+```
 
+```{r}
 #5
 E(g)$weight
+```
 
+```{r}
 #6
 plot(g, edge.label=round(E(g)$weight), edge.width = E(g)$weight, vertex.label = V(g)$name, vertex.size = degree(g), edge.arrow.size=0.01)
+```
 
+```{r}
 #7
 regions.df <- read.csv("region.csv")
 str(regions.df)
+```
 
+```{r}
 #8
 gnodes.attributes <- regions.df[match(V(g)$name, regions.df$name),]
 V(g)$region <- as.character(gnodes.attributes$region)
+```
 
+```{r}
 #9
 color.mat <- cbind(c("E","W","C"), c("red","blue","green"))
 V(g)$color <- color.mat[match(V(g)$region, color.mat[,1]), 2]
 color.mat <- cbind(c("E","W","C"), c("red","blue","green"))
 V(g)$color <- color.mat[match(V(g)$region, color.mat[,1]), 2]
 plot(g, edge.label=round(E(g)$weight), edge.width = E(g)$weight, vertex.label = V(g)$name, vertex.color = V(g)$color, vertex.size = degree(g), edge.arrow.size=0.01)
+```
