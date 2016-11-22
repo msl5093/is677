@@ -15,6 +15,13 @@ library(foreach)
 library(doParallel)
 ```
 
+Machine details:
+
+CPU:        2 physical cores, 4 threads
+RAM:        16.0 GB
+OS:         Windows 10
+Make/Model: Microsoft Surface Pro 4
+
 ```{r}
 #1
 g.b1 <- barabasi.game(5000, power = 1, m = 3, directed = FALSE)
