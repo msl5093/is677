@@ -1,0 +1,60 @@
+library(foreach)
+library(bigmemory)
+library(biganalytics)
+
+#1
+airline_08 <- read.big.matrix("2008.csv", type = "integer", header = TRUE, backingfile = "2008.bin", descriptorfile = "2008.desc")
+
+#2
+options(scipen = 999, digits = 0)
+
+start_time <- Sys.time()
+
+summary(airline_08)
+
+stop_time <- Sys.time() - start_time
+stop_time
+
+#########################################
+#  Surface Pro 4
+#  Windows 10
+#  16.0 GB RAM
+#  2 physical cores, 4 threads
+#########################################
+
+#3
+late_flights_ind <- mwhich(airline_08, "ArrDelay", 0, "gt")
+nrow(airline_08[late_flights_ind,])
+
+#4
+early_flights_ind <- mwhich(airline_08, "ArrDelay", 0, "lt")
+nrow(airline_08[early_flights_ind,])
+
+#5
+ontime_flights_ind <- mwhich(airline_08, "ArrDelay", 0, "eq")
+nrow(airline_08[ontime_flights_ind,])
+
+#6
+distances <- airline_08[,"Distance"]
+mean(distances)
+
+#7
+on_time_distances <- airline_08[ontime_flights_ind,"Distance"]
+mean(on_time_distances)
+
+#8
+early_distances <- airline_08[early_flights_ind,"Distance"]
+mean(early_distances)
+
+#9
+late_distances <- airline_08[late_flights_ind,"Distance"]
+mean(late_distances)
+
+#10
+##################
+# This question cannot be answered because the read.big.matrix command can only accept one data type
+# for all the values it imports from an external file. We used the integer data type as most of the data
+# points were integers/numeric in nature. Subsequently, the bigmemory package imported the Dest
+# feature with all NAs as the original value was of data type string since they are the 
+# corresponding IATA airport code. 
+#################

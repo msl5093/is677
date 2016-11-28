@@ -3,3 +3,10 @@
 
 # ignore .Rhistory
 .Rhistory
+
+# ignore bigmemory bin and desc files
+*.bin
+*.desc
+
+# ignore specific large csv file
+2008.csv
