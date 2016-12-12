@@ -1,0 +1,254 @@
+---
+title: "Final"
+author: "Mike Lehman"
+date: "December 12, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## #1
+
+```{r}
+#1a
+age <- c(19,23,25,37,65,51,33,51,70,18,23,42,18,39,37)
+maxHR <- c(200,182,180,180,156,169,174,172,153, 199, 193, 174, 198, 183, 178)
+```
+
+```{r}
+#1b
+plot(age, maxHR, xlab = "Age", ylab = "Maximum Heart Rate", main = "Max. Heart Rate by Age")
+```
+
+```{r}
+#1c
+ageHR.df <- as.data.frame(cbind(age, maxHR))
+fit <- lm(maxHR ~ age, ageHR.df)
+fit
+```
+
+```{r}
+#1d
+plot(age, maxHR, xlab = "Age", ylab = "Maximum Heart Rate", main = "Max. Heart Rate by Age")
+abline(208.7079, -0.7979)
+```
+
+```{r}
+#1e
+layout(matrix(1:4, nrow = 2))
+plot(fit)
+```
+
+### Residuals vs. Fitted
+
+The residuals vs. fitted plot shows the difference between actual and predicted (fitted) values on the y-axis, and the predicted (fitted) values on the x-axis. This plot shows if the residuals have non-linear patterns which the model may not have found, but would show up in this plot. The results show that there aren't any non-linear patterns about which we should be concerned. The points cluster around the horizontal line and do not have any distinct non-linear pattern.
+
+### Scale Location
+
+The scale location plot shows if residuals are spread equally along the ranges of predictors. If the points are randomly scattered along a horizontal line. In our case the line has an upward angle, and the points scatter wider as the slope increases. This means the residuals (difference between actual and predicted values) increased as the predicted value increased.
+
+### Q-Q Plot
+
+Q-Q plots show if residuals are normally distributed. The points should fall along a straight dashed line without much random spread. In our case the points are almost all distributed along the dashed line, but some of the smaller values fall well below the line.
+
+### Residuals vs. Leverage
+
+Residuals vs. lerverage plots help to fund influential cases of outliers. Large or small outliers may or may not have a significant impact in a linear model. Meaning, it may be possible to discard them and not effect the model's outcome all that much. Values in the upper-right or lower-right corner indicate significant outliers outside of the regression line. In our case there do not appear to be any significant outliers.
+
+```{r}
+#1f
+fit
+```
+
+The coefficient of -0.7979 for age implies that for every unit increase in age, maximum heart rate decreases by 0.7979. 
+
+```{r}
+#1g
+summary(fit)
+```
+
+### Residual Standard Error
+
+The Residual Standard Error is the sum of the squares of the residuals (differences between actual and predicted values) divided by degrees of freedom (number of rows - number of coefficients for which to solve). 
+
+### R-Squared
+
+R-Squared is the sum of squares of residuals divided by the sum of squares of the difference between actuals and mean values. The value will range between 0 and 1 with a value closer to 1 meaning a better fit. Basically, how close the predicted values are to the regression line and can be summarized as: explain variation / total variation.
+
+### Adjusted R-Squared
+
+The Adjusted R-Squared is an R-Squared value that has been adjusted based on the number of predictors in the model. This is useful to compare multiple models trained on the same data but with different numbers of predictors. In general, it is a truer to actual performance metric than the raw R-Squared.
+
+```{r}
+#1h
+new.ages <- data.frame(age = c(50, 60))
+fit.prediction <- predict(fit, newdata = new.ages)
+fit.prediction
+```
+
+## #2
+
+```{r}
+library(igraph)
+library(igraphdata)
+data(USairports)
+```
+
+```{r}
+#2a
+airports <- USairports
+
+# vertices
+V(airports)
+
+# edges
+E(airports)
+
+# directed?
+is_directed(airports)
+```
+
+```{r}
+#2b
+# maximum degrees
+max(degree(airports))
+
+# minimum degrees
+min(degree(airports))
+
+# average degrees
+mean(degree(airports))
+```
+
+```{r}
+#2c
+# busiest
+V(airports)$name[degree(airports) == max(degree(airports))]
+
+# least busy
+V(airports)$name[degree(airports) == min(degree(airports))]
+```
+
+```{r}
+#2d
+mean(E(airports))
+```
+
+```{r}
+#2e
+E(airports) [ to("JFK") ] #23,473
+E(airports) [ from("JFK") ] #23,473
+```
+
+Total flights to JFK: 23,473
+Total flights from JFK: 23,473
+
+Total: 46,946
+
+## #3
+
+```{r}
+library(TH.data)
+glaucoma <- GlaucomaM
+```
+
+```{r}
+#3a
+library(rpart)
+tree <- rpart(Class ~ ., data = glaucoma, method="class", parms = list(split="information"))
+tree$cptable
+```
+
+
+```{r}
+#3b
+plotcp(tree)
+```
+
+Select the minimum xerror and corresponding standard deviation xstd. Select the smallest tree within 1 standard deviation of the minimum. 
+
+Select the smallest tree whose xerror is below sum of xerror and xstd:
+
+min xerror = 0.3673469
+
+min xstd = 0.5531681
+
+0.37 + 0.55 = 0.92
+
+smallest tree (nsplit) with xerror below 0.92 = tree #2 (1 split)
+
+cp = 0.07142857 ~ 0.071
+
+
+```{r}
+#3c
+tree.pruned <- prune(tree, cp = .071)
+
+library(rpart.plot)
+prp(tree.pruned, type = 2, extra = 104, fallen.leaves = TRUE, main = "Pruned Decision Tree")
+```
+
+## #4
+
+### Barabasi-Albert
+
+```{r}
+#4a
+# Barabasi-Albert 
+g.b.densities <- matrix(ncol = 10, nrow = 10)
+
+for (n in 1:10) {
+  for (i in seq(100, 1000, 100)) {
+    g.b <- barabasi.game(i, power = 1, m = 8)
+    g.b.densities[n, i/100] = graph.density(g.b)
+  }
+}
+
+g.b.means <- vector(mode = "numeric", length = 10)
+
+for (i in 1:10) {
+  g.b.means[i] = mean(g.b.densities[1,])
+}
+
+
+```
+
+### Erdos-Renyi
+
+```{r}
+g.er.densities <- matrix(ncol = 10, nrow = 10)
+
+for (n in 1:10) {
+  for (i in seq(100, 1000, 100)){
+    g.er <- erdos.renyi.game(i, p = (10/(i-1))) 
+    g.er.densities[n, i/100] = graph.density(g.er)
+  }
+}
+
+g.er.means <- vector(mode = "numeric", length = 10)
+
+for (i in 1:10) {
+  g.er.means[i] = mean(g.er.densities[,5])
+}
+
+
+sizes <- c(100,200,300,400,500,600,700,800,900,1000)
+
+plot(sizes, g.er.means, xlab = "Mean Graph Density", ylab = "Graph Size", main = "Erdos-Renyi Graph Mean Density by Size")
+```
+
+## #5
+
+```{r}
+#5a
+```
+
+```{r}
+#5b
+```
+
+```{r}
+#5c
+```
