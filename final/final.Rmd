@@ -2,7 +2,7 @@
 title: "Final"
 author: "Mike Lehman"
 date: "December 12, 2016"
-output: html_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
@@ -202,17 +202,21 @@ g.b.densities <- matrix(ncol = 10, nrow = 10)
 for (n in 1:10) {
   for (i in seq(100, 1000, 100)) {
     g.b <- barabasi.game(i, power = 1, m = 8)
-    g.b.densities[n, i/100] = graph.density(g.b)
+    g.b.densities[i/100, n] = graph.density(g.b)
   }
 }
 
 g.b.means <- vector(mode = "numeric", length = 10)
 
 for (i in 1:10) {
-  g.b.means[i] = mean(g.b.densities[1,])
+  g.b.means[i] = mean(g.b.densities[i,1:10])
 }
 
+sizes <- c(100,200,300,400,500,600,700,800,900,1000)
+g.b.df <- data.frame(sizes, g.b.means)
+names(g.b.df) <- c("size","mean_density")
 
+plot(g.b.df$size, g.b.df$mean_density, xlab = "Graph Size", ylab = "Mean Density", main = "Mean Density by Size - Barabasi-Albert")
 ```
 
 ### Erdos-Renyi
@@ -230,25 +234,54 @@ for (n in 1:10) {
 g.er.means <- vector(mode = "numeric", length = 10)
 
 for (i in 1:10) {
-  g.er.means[i] = mean(g.er.densities[,5])
+  g.er.means[i] = mean(g.er.densities[i,1:10])
 }
 
+g.er.df <- data.frame(sizes, g.er.means)
+names(g.er.df) <- c("size","mean_density")
 
-sizes <- c(100,200,300,400,500,600,700,800,900,1000)
-
-plot(sizes, g.er.means, xlab = "Mean Graph Density", ylab = "Graph Size", main = "Erdos-Renyi Graph Mean Density by Size")
+plot(g.er.df$size, g.er.df$mean_density, xlab = "Graph Size", ylab = "Mean Density", main = "Mean Density by Size - Erdos-Renyi")
 ```
+
+### Barabasi-Albert
+
+For the Barabasi-Albert graphs, as graph size increases, mean density decreases. Graph density refers to the total number of edges actually in the graph versus the total possible edges. For the random Barabasi-Albert graphs, there is a steady decrease in density as graph size increases. The mean densities approach 0. There appears to be a direct correlation between BA graph size and density.
+
+### Erdos-Renyi
+
+As Erdos-Renyi graph size increases, the mean densities of the graphs appear to fluctuate randomly. This seems to indicate that, unlike Barabasi-Albert graphs, there does not appear to be a direct correlation between graph size and graph density. 
 
 ## #5
 
 ```{r}
 #5a
+library(bigmemory)
+
+airline_08 <- read.big.matrix("2008.csv", type = "integer", header = TRUE, backingfile = "2008.bin", descriptorfile = "2008.desc")
+
+summary(airline_08)
 ```
 
 ```{r}
 #5b
+na_tail_flights <- mwhich(airline_08, "TailNum", NA, "eq")
+nrow(airline_08[na_tail_flights,])
 ```
+
+6,754,265
 
 ```{r}
 #5c
+days <- c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
+flightCountByDays <- vector(mode = "numeric", length = 7)
+
+for (i in 1:7) {
+  day.index <- mwhich(airline_08, "DayOfWeek", i, "eq")
+  flightCountByDays[i] <- nrow(airline_08[day.index,])  
+}
+
+days.df <- data.frame(days,flightCountByDays)
+names(days.df) <- c("day_of_week","flights")
+
+days.df
 ```
